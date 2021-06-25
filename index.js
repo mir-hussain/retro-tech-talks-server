@@ -40,7 +40,7 @@ client.connect((err) => {
 
   app.post("/addBlog", (req, res) => {
     const newBlog = req.body;
-    BlogCollection.insertOne(newBlog).then((result) => {
+    blogCollection.insertOne(newBlog).then((result) => {
       res.status(200).send(result.insertedCount > 0);
     });
   });
@@ -53,9 +53,16 @@ client.connect((err) => {
 
   app.delete("/deleteBlog/:id", (req, res) => {
     const id = ObjectId(req.params.id);
-    BlogCollection.findOneAndDelete({ _id: id }).then(
-      (documents) => res.send(!!documents.value)
-    );
+    blogCollection
+      .findOneAndDelete({ _id: id })
+      .then((documents) => res.send(!!documents.value));
+  });
+
+  app.get("/getBlog/:id", (req, res) => {
+    const id = ObjectId(req.params.id);
+    blogCollection
+      .findOne({ _id: id })
+      .then((documents) => res.send(documents));
   });
 
   app.post("/addAdmin", (req, res) => {
@@ -69,15 +76,6 @@ client.connect((err) => {
     adminCollection.find().toArray((err, service) => {
       res.status(200).send(service);
     });
-  });
-
-  app.post("/servicesByKeys", (req, res) => {
-    const serviceKeys = req.body;
-    serviceCollection
-      .find({ key: { $in: serviceKeys } })
-      .toArray((err, documents) => {
-        res.send(documents);
-      });
   });
 });
 
